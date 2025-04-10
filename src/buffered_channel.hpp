@@ -8,7 +8,12 @@
 
 template <typename T, uint32_t C>
 class buffered_channel {
-  std::pair<T, std::binary_semaphore*> *buffer;
+  struct item {
+    T value;
+    std::binary_semaphore *sender;
+  };
+
+  item *buffer;
   size_t size{};
   size_t start{}, end{};
   std::mutex m;
@@ -16,20 +21,23 @@ class buffered_channel {
   std::condition_variable cv_recvers;
 
 public:
-  buffered_channel() : buffer(new std::pair<T, std::binary_semaphore*>[C]) {}
+  buffered_channel() : buffer(new item[C]) {}
 
   void send(const T &e) {
-    std::unique_lock<std::mutex> lock(m);
-
-    cv_senders.wait(lock, [this]{ return size < C; });
-
     std::binary_semaphore me(0);
 
-    buffer[end] = {e, &me}; // We should automatically copy here right?
-    end = (end + 1) % C;
-    ++size;
+    {
+      std::unique_lock<std::mutex> lock(m);
 
-    cv_recvers.notify_one();
+      cv_senders.wait(lock, [this]{ return size < C; });
+
+      buffer[end] = {e, &me}; // We should automatically copy here right?
+      end = (end + 1) % C;
+      ++size;
+
+      cv_recvers.notify_one();
+    }
+
     me.acquire();
   }
 
@@ -43,7 +51,9 @@ public:
     --size;
 
     cv_senders.notify_one();
-    res.second->release();
+    res.sender->release();
+
+    return res.value;
   }
 
   ~buffered_channel() {
