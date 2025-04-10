@@ -43,8 +43,6 @@ void run_test(chan_type& channel) {
   }
   thread_pool[3] = std::thread(receiver_func);
 
-  std::cout << "All threads spawned\n";
-
   for (auto &t : thread_pool) {
     t.join();
   }
