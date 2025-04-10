@@ -1,5 +1,5 @@
-test_buffered_channel:
-	g++ -std=c++20 -pthread test_buffered_channel.cpp -o test_buf.o
+test_channels:
+	g++ -std=c++20 -pthread test_channels.cpp -o test_chan.o
 
 clean:
 	rm -rf .dSYM *.o

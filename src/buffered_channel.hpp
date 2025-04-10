@@ -7,6 +7,7 @@
 #include <mutex>
 
 template <typename T, uint32_t C>
+requires(C > 0)
 class buffered_channel {
   struct item {
     T value;
