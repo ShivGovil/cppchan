@@ -1,5 +1,3 @@
-// Need to think about how this would work in a switch() {case} thing
-
 #include <condition_variable>
 #include <cstddef>
 #include <cstring>

@@ -1,8 +1,7 @@
-// Need to think about how this would work in a switch() {case} thing
-
 #include <condition_variable>
 #include <cstddef>
 #include <cstring>
+#include <optional>
 #include <semaphore>
 #include <mutex>
 
@@ -12,9 +11,8 @@ class unbuffered_channel {
   std::condition_variable cv_senders;
   std::condition_variable cv_recvers;
 
-  T value{};
+  std::optional<T> value{};
   std::binary_semaphore *sender_sem{};
-  bool full{};
 
 public:
   void send(const T &e) {
@@ -23,10 +21,9 @@ public:
     {
       std::unique_lock<std::mutex> lock(m);
 
-      cv_senders.wait(lock, [this]{ return !full; });
+      cv_senders.wait(lock, [this]{ return !value.has_value(); });
 
       value = e;
-      full = true;
       sender_sem = &me;
 
       cv_recvers.notify_one();
@@ -38,10 +35,10 @@ public:
   T recv() {
     std::unique_lock<std::mutex> lock(m);
 
-    cv_recvers.wait(lock, [this]{ return full; });
+    cv_recvers.wait(lock, [this]{ return value.has_value(); });
 
-    T res = std::move(value);
-    full = false;
+    T res = std::move(value.value());
+    value = std::nullopt;
 
     std::binary_semaphore *signal = sender_sem;
     sender_sem = nullptr;
