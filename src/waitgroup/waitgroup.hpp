@@ -7,6 +7,7 @@ class waitgroup {
   std::mutex thread_mtx;
 
 public:
+  waitgroup() = default;
   waitgroup(const waitgroup& other) = delete;
   waitgroup& operator=(const waitgroup& other) = delete;
 
