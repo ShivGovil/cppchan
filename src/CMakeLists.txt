@@ -11,4 +11,5 @@ set(CMAKE_CXX_FLAGS_RELEASE "-O3 -march=native -flto")
 set(CMAKE_INTERPROCEDURAL_OPTIMIZATION_RELEASE TRUE)
 
 add_subdirectory(channels)
+add_subdirectory(waitgroup)
 add_subdirectory(test)

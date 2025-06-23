@@ -8,7 +8,7 @@ foreach(TEST_SOURCE ${TEST_SOURCES})
 
   add_executable(${TEST_NAME} ${TEST_SOURCE})
 
-  target_link_libraries(${TEST_NAME} channels)
+  target_link_libraries(${TEST_NAME} channels waitgroup)
 
   if (CMAKE_BUILD_TYPE MATCHES "DebugGit")
     target_compile_options(${TEST_NAME} PRIVATE -fsanitize=address -fsanitize=leak -fno-omit-frame-pointer -Wall -Wextra -Werror -pedantic)
@@ -22,3 +22,4 @@ endforeach()
 
 find_package(Threads REQUIRED)
 target_link_libraries(test_channels Threads::Threads)
+target_link_libraries(test_waitgroups Threads::Threads)
