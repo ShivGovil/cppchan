@@ -30,7 +30,7 @@ public:
 
       cv_senders.wait(lock, [this]{ return size < C; });
 
-      buffer[end] = {e, &me}; // We should automatically copy here right?
+      buffer[end] = {e, &me};
       end = (end + 1) % C;
       ++size;
 
